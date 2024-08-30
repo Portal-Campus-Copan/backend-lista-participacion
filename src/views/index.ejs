@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Endpoints y Descripciones</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4a90e2;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      color: #333;
+      border-bottom: 2px solid #4a90e2;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+
+    details {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    details summary {
+      font-weight: bold;
+      cursor: pointer;
+      color: #4a90e2;
+    }
+
+    details summary:hover {
+      color: #357abd;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    pre {
+      background-color: #f8f8f8;
+      border-left: 4px solid #4a90e2;
+      padding: 10px;
+      border-radius: 3px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      /* Allows text wrapping */
+    }
+
+    code {
+      font-family: monospace;
+      color: #e94e77;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Endpoints y Descripciones</h1>
+
+  <h2>Endpoints de Lista particiapcion</h2>
+  <details>
+    <summary><code>GET /api/v1/lista-participacion</code></summary>
+    <ul>
+      <li><strong>Descripción:</strong> Obtener una lista de todas las participaciones en actividades.</li>
+      <br>
+      <li><strong>Instrucciones:</strong> No se requiere ningún parámetro adicional para esta solicitud. Devuelve todas las participaciones registradas en la base de datos.</li>
+      <br>
+      <li><strong>Ejemplo de solicitud:</strong></li>
+      <pre>
+          // Para obtener todas las participaciones:
+        <code>
+          GET /api/v1/lista-participacion
+        </code>
+      </pre>
+      <li><strong>Ejemplo de respuesta:</strong></li>
+      <pre><code>
+[
+    {
+        "actividad_id": 1,
+        "nombre": "Juan Pérez",
+        "slug_actividad": "nueva-actividad",
+        "numero_cuenta": "12345678",
+        "carrera_id": 2,
+        "fecha": "2024-08-28T00:00:00.000Z"
+    },
+    ...
+]
+        </code></pre>
+      <li><strong>Errores posibles:</strong></li>
+      <ul>
+        <li><strong><code>500 Internal Server Error:</code></strong> En caso de error en la base de datos o en el servidor.
+          <pre><code>
+{
+    "error": "Error al obtener la lista de participaciones"
+}
+            </code></pre>
+        </li>
+      </ul>
+    </ul>
+  </details>
+
+  <details>
+    <summary><code>GET /api/v1/lista-participacion/:idOrSlug</code></summary>
+    <ul>
+      <li><strong>Descripción:</strong> Obtener la información de una participación específica por <code>actividad_id</code> o <code>slug_actividad</code>.</li>
+      <br>
+      <li><strong>Instrucciones:</strong> Reemplaza <code>:idOrSlug</code> en la URL con el <code>actividad_id</code> o <code>slug_actividad</code> de la participación que deseas obtener.</li>
+      <br>
+      <li><strong>Ejemplo de solicitud:</strong></li>
+      <pre>
+          // Para obtener una participación por ID:
+        <code>
+          GET /api/v1/lista-participacion/1
+        </code>
+          // Para obtener una participación por Slug:
+        <code>
+          GET /api/v1/lista-participacion/nueva-actividad
+        </code>
+      </pre>
+      <li><strong>Ejemplo de respuesta:</strong></li>
+      <pre><code>
+{
+    "actividad_id": 1,
+    "nombre": "Juan Pérez",
+    "slug_actividad": "nueva-actividad",
+    "numero_cuenta": "12345678",
+    "carrera_id": 2,
+    "fecha": "2024-08-28T00:00:00.000Z"
+}
+        </code></pre>
+      <li><strong>Errores posibles:</strong></li>
+      <ul>
+        <li><strong><code>404 Not Found:</code></strong> Si la participación no existe.
+          <pre><code>
+{
+    "error": "Participación no encontrada"
+}
+            </code></pre>
+        </li>
+        <li><strong><code>500 Internal Server Error:</code></strong> En caso de error en la base de datos o en el servidor.
+          <pre><code>
+{
+    "error": "Error al obtener la participación"
+}
+            </code></pre>
+        </li>
+      </ul>
+    </ul>
+  </details>
+
+  <details>
+    <summary><code>POST /api/v1/lista-participacion</code></summary>
+    <ul>
+      <li><strong>Descripción:</strong> Crear una nueva participación en una actividad.</li>
+      <br>
+      <li><strong>Instrucciones:</strong> Envía los datos requeridos en el cuerpo de la solicitud en formato JSON.</li>
+      <br>
+      <li><strong>Campos requeridos:</strong></li>
+      <ul>
+        <li><code>actividad_id</code> - ID de la actividad en la que se participa</li>
+        <li><code>nombre</code> - Nombre del participante</li>
+        <li><code>slug_actividad</code> - Slug único de la actividad</li>
+        <li><code>numero_cuenta</code> - Número de cuenta del participante</li>
+        <li><code>carrera_id</code> - ID de la carrera del participante</li>
+      </ul>
+      <br>
+      <li><strong>Ejemplo de solicitud:</strong></li>
+      <pre>
+        <code>
+POST /api/v1/lista-participacion
+Content-Type: application/json
+
+{
+    "actividad_id": 1,
+    "nombre": "Juan Pérez",
+    "slug_actividad": "nueva-actividad",
+    "numero_cuenta": "12345678",
+    "carrera_id": 2
+}
+        </code>
+      </pre>
+      <li><strong>Ejemplo de respuesta:</strong></li>
+      <pre><code>
+{
+    "message": "Participación creada exitosamente"
+}
+        </code></pre>
+      <li><strong>Errores posibles:</strong></li>
+      <ul>
+        <li><strong><code>400 Bad Request:</code></strong> Si falta algún campo requerido.
+          <pre><code>
+{
+    "error": "Faltan datos requeridos"
+}
+            </code></pre>
+        </li>
+        <li><strong><code>500 Internal Server Error:</code></strong> En caso de error en la base de datos o en el servidor.
+          <pre><code>
+{
+    "error": "Error al crear la participación"
+}
+            </code></pre>
+        </li>
+      </ul>
+    </ul>
+  </details>
+
+
+</body>
+
+</html>
