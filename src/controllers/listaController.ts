@@ -2,28 +2,46 @@ import { Request, Response } from 'express';
 import client from '../servicios/db';
 import moment from 'moment-timezone';
 
-export interface ListaParticipantes {
-    actividad_id: number;
-    nombre: string;
-    slug_actividad: string;
-    numero_cuenta: string;
-    carrera_id: number;
-    fecha: Date;
+interface ListaParticipantes {
+  actividad_id: number;
+  nombre: string;
+  slug_actividad: string;
+  numero_cuenta: string;
+  carrera_id: number;
+  fecha: Date;
+  carrera_nombre: string; // Añadido
 }
+
 
 // Obtener todas las participaciones
 export const getListaParticipacion = async (req: Request, res: Response): Promise<void> => {
   try {
-    const resultado = await client.execute("SELECT * FROM lista_participantes ORDER BY actividad_id ASC;");
+    const resultado = await client.execute(`
+      SELECT 
+        lp.actividad_id, 
+        lp.nombre, 
+        lp.slug_actividad, 
+        lp.numero_cuenta, 
+        lp.carrera_id, 
+        lp.fecha, 
+        c.nombre AS carrera_nombre
+      FROM 
+        lista_participantes lp
+      JOIN 
+        carreras c ON lp.carrera_id = c.id
+      ORDER BY 
+        lp.actividad_id ASC;
+    `);
 
     if (Array.isArray(resultado.rows)) {
       const formattedData: ListaParticipantes[] = resultado.rows.map((row: any) => ({
-        actividad_id: row[0],
-        nombre: row[1],
-        slug_actividad: row[2],
-        numero_cuenta: row[3],
-        carrera_id: row[4],
-        fecha: new Date(row[5]),
+        actividad_id: row.actividad_id,
+        nombre: row.nombre,
+        slug_actividad: row.slug_actividad,
+        numero_cuenta: row.numero_cuenta,
+        carrera_id: row.carrera_id,
+        fecha: new Date(row.fecha),
+        carrera_nombre: row.carrera_nombre // Añadido el nombre de la carrera
       }));
       res.status(200).json(formattedData);
     } else {
@@ -43,8 +61,38 @@ export const getParticipacionByIdOrSlug = async (req: Request, res: Response): P
     // Determinar si idOrSlug es un número o un string
     const isId = !isNaN(Number(idOrSlug));
     const query = isId
-      ? "SELECT * FROM lista_participantes WHERE actividad_id = ?"
-      : "SELECT * FROM lista_participantes WHERE slug_actividad = ?";
+      ? `
+        SELECT 
+          lp.actividad_id, 
+          lp.nombre, 
+          lp.slug_actividad, 
+          lp.numero_cuenta, 
+          lp.carrera_id, 
+          lp.fecha, 
+          c.nombre AS carrera_nombre
+        FROM 
+          lista_participantes lp
+        JOIN 
+          carreras c ON lp.carrera_id = c.id
+        WHERE 
+          lp.actividad_id = ?
+        `
+      : `
+        SELECT 
+          lp.actividad_id, 
+          lp.nombre, 
+          lp.slug_actividad, 
+          lp.numero_cuenta, 
+          lp.carrera_id, 
+          lp.fecha, 
+          c.nombre AS carrera_nombre
+        FROM 
+          lista_participantes lp
+        JOIN 
+          carreras c ON lp.carrera_id = c.id
+        WHERE 
+          lp.slug_actividad = ?
+        `;
 
     const resultado = await client.execute({
       sql: query,
@@ -53,14 +101,15 @@ export const getParticipacionByIdOrSlug = async (req: Request, res: Response): P
 
     if (Array.isArray(resultado.rows) && resultado.rows.length > 0) {
       const formattedData: ListaParticipantes[] = resultado.rows.map((row: any) => ({
-        actividad_id: row[0],
-        nombre: row[1],
-        slug_actividad: row[2],
-        numero_cuenta: row[3],
-        carrera_id: row[4],
-        fecha: new Date(row[5]),
+        actividad_id: row.actividad_id,
+        nombre: row.nombre,
+        slug_actividad: row.slug_actividad,
+        numero_cuenta: row.numero_cuenta,
+        carrera_id: row.carrera_id,
+        fecha: new Date(row.fecha),
+        carrera_nombre: row.carrera_nombre // Añadido el nombre de la carrera
       }));
-      res.status(200).json(formattedData[0]);
+      res.status(200).json(formattedData);
     } else {
       res.status(404).json({ error: 'Participación no encontrada' });
     }
@@ -69,6 +118,7 @@ export const getParticipacionByIdOrSlug = async (req: Request, res: Response): P
     res.status(500).json({ error: 'Error fetching participación' });
   }
 };
+
 
 // Crear una nueva participación
 export const createParticipacion = async (req: Request, res: Response): Promise<void> => {
