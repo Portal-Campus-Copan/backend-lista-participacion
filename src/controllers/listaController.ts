@@ -74,7 +74,7 @@ export const getParticipacionByIdOrSlug = async (req: Request, res: Response): P
 export const createParticipacion = async (req: Request, res: Response): Promise<void> => {
     try {
     const { nombre, slug_actividad, numero_cuenta, carrera_id } = req.body;
-    const fecha = moment().format('YYYY-MM-DD');
+    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
 
     await client.execute({
       sql: "INSERT INTO lista_participantes (nombre, slug_actividad, numero_cuenta, carrera_id, fecha) VALUES ( ?, ?, ?, ?, ?)",
