@@ -72,41 +72,18 @@ export const getParticipacionByIdOrSlug = async (req: Request, res: Response): P
 
 // Crear una nueva participación
 export const createParticipacion = async (req: Request, res: Response): Promise<void> => {
-  try {
-      // Obtener las participaciones del cuerpo de la solicitud
-      const participaciones = req.body; // Debe ser un array de participaciones
+    try {
+    const { nombre, slug_actividad, numero_cuenta, carrera_id } = req.body;
+    const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
 
-      // Validar que participaciones sea un array
-      if (!Array.isArray(participaciones)) {
-          res.status(400).json({ error: 'El cuerpo de la solicitud debe ser un array de participaciones' });
-          return;
-      }
+    await client.execute({
+      sql: "INSERT INTO lista_participantes (nombre, slug_actividad, numero_cuenta, carrera_id, fecha) VALUES ( ?, ?, ?, ?, ?)",
+      args: [nombre, slug_actividad, numero_cuenta, carrera_id, fecha]
+    });
 
-      // Preparar los valores para la inserción en la base de datos
-      const fecha = moment().format('YYYY-MM-DD HH:mm:ss');
-      const queries = participaciones.map(participacion => {
-          const { nombre, slug_actividad, numero_cuenta, carrera_id } = participacion;
-
-          // Validar cada participación
-          if (!nombre || !slug_actividad || !numero_cuenta || !carrera_id) {
-              throw new Error('Faltan datos requeridos en una de las participaciones');
-          }
-
-          // Preparar la consulta de inserción
-          return {
-              sql: "INSERT INTO lista_participantes (nombre, slug_actividad, numero_cuenta, carrera_id, fecha) VALUES (?, ?, ?, ?, ?)",
-              args: [nombre, slug_actividad, numero_cuenta, carrera_id, fecha]
-          };
-      });
-
-      // Ejecutar todas las consultas de inserción
-      for (const query of queries) {
-          await client.execute(query);
-      }
-
-      res.status(200).json({ message: 'Participaciones creadas exitosamente' });
+    res.status(200).json({ message: 'Participación creada exitosamente' });
   } catch (error) {
-      console.error('Error creating participaciones:', error);
-      res.status(500).json({ error: 'Error al crear las participaciones' });
+    console.error('Error creating participación:', error);
+    res.status(500).json({ error: 'Error al crear la participación' });
   }
 };
