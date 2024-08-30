@@ -28,7 +28,7 @@ export const getListaParticipacion = async (req: Request, res: Response): Promis
       FROM 
         lista_participantes lp
       JOIN 
-        carreras c ON lp.carrera_id = c.id
+        carrera c ON lp.carrera_id = c.id
       ORDER BY 
         lp.actividad_id ASC;
     `);
@@ -73,7 +73,7 @@ export const getParticipacionByIdOrSlug = async (req: Request, res: Response): P
         FROM 
           lista_participantes lp
         JOIN 
-          carreras c ON lp.carrera_id = c.id
+          carrera c ON lp.carrera_id = c.id
         WHERE 
           lp.actividad_id = ?
         `
@@ -89,7 +89,7 @@ export const getParticipacionByIdOrSlug = async (req: Request, res: Response): P
         FROM 
           lista_participantes lp
         JOIN 
-          carreras c ON lp.carrera_id = c.id
+          carrera c ON lp.carrera_id = c.id
         WHERE 
           lp.slug_actividad = ?
         `;
